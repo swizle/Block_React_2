@@ -1,0 +1,27 @@
+.card {
+  display: flex;
+  align-items: center;
+  box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.15);
+  margin: 10px;
+  width: 475px;
+  box-sizing: border-box;
+}
+
+.img {
+  width: 183px !important;
+  height: 281px !important;
+}
+
+.container {
+  box-sizing: border-box;
+  padding: 10px;
+}
+
+.releaseDate {
+  font-size: 12px;
+  color: #827E7E;
+}
+
+.description {
+  font-size: 12px;
+}

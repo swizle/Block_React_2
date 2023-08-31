@@ -1,0 +1,21 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Comfortaa';
+  background-color: #F7F7F7;
+}
+
+.movie-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.movie-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 25px;
+  background-color: white;
+}
