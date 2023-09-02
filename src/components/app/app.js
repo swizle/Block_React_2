@@ -1,5 +1,6 @@
-import { React, Component } from 'react';
-import { Tabs } from 'antd';
+import React, { Component } from 'react';
+import { Tabs, Spin, Pagination } from 'antd';
+import { debounce } from 'lodash';
 
 import Search from '../search';
 import Card from '../card';
@@ -10,37 +11,76 @@ export default class MovieList extends Component {
   state = {
     films: [],
     loading: true,
+    queryText: '',
+    currentPage: 1,
+    totalResults: 0,
   };
 
-  async componentDidMount() {
+  handleSearchFilm = (text) => {
+    if (text.trim() === '') {
+      alert('Введите название фильма!');
+      return;
+    }
+    this.setState({ queryText: text.trim(), loading: true, currentPage: 1 }, () => {
+      this.fetchMovies();
+    });
+  };
+
+  handleDebounceSearchFilm = debounce((e) => {
+    const text = e.target.value;
+    this.handleSearchFilm(text);
+  }, 1000);
+
+  handlePageChange = (page) => {
+    this.setState({ loading: true, currentPage: page }, () => {
+      this.fetchMovies();
+    });
+  };
+
+  async fetchMovies() {
+    const { queryText, currentPage } = this.state;
+    const apiKey = '9c94b420619f7bf5c89fbe449f2335f5';
+    const apiUrl = `https://api.themoviedb.org/3/search/movie?query=${queryText}&include_adult=false&language=en-US&page=${currentPage}`;
     const options = {
       method: 'GET',
       headers: {
         accept: 'application/json',
-        Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Yzk0YjQyMDYxOWY3YmY1Yzg5ZmJlNDQ5ZjIzMzVmNSIsInN1YiI6IjY0ZWYyMDVhM2E5OTM3MDExY2JkMTEyMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.bx5BgGPER_m3UPUPnQ4s4JMiXv5ejsTGJj46OfdKL7w',
+        Authorization: `Bearer ${apiKey}`,
       },
     };
 
     try {
-      const response = await fetch('https://api.themoviedb.org/3/search/movie?query=clown&include_adult=false&language=en-US&page=1', options);
+      const response = await fetch(apiUrl, options);
       const data = await response.json();
-      const filmsData = data.results.slice(0, 6); // Получаем первые 6 фильмов
 
-      this.setState({ films: filmsData, loading: false });
+      if (data.total_results === 0) {
+        alert('К сожалению, фильмов с таким названием нет!');
+      }
+
+      this.setState({
+        films: data.results,
+        loading: false,
+        totalResults: data.total_results,
+      });
     } catch (error) {
-      console.error(error);
+      alert(error);
       this.setState({ loading: false });
     }
   }
 
   render() {
-    const { films, loading } = this.state;
+    const {
+      films, loading, currentPage, totalResults,
+    } = this.state;
 
-    const items = [
+    const tabs = [
       {
         key: '1',
         label: 'Search',
-        children: <Search />,
+        children: <Search
+          onSearchFilm={this.handleSearchFilm}
+          onChangeText={this.handleDebounceSearchFilm}
+        />,
       },
       {
         key: '2',
@@ -49,21 +89,27 @@ export default class MovieList extends Component {
       },
     ];
 
-    if (loading) {
-      return <div>Loading...</div>;
-    }
-
     return (
       <div className="movie-container">
-        <Tabs
-          defaultActiveKey="1"
-          centered
-          items={items}
-        />
+        <Tabs defaultActiveKey="1" centered items={tabs} />
+
         <div className="movie-list">
-          {films.map((film) => (
-            <Card key={film.id} film={film} />
-          ))}
+          {loading ? (
+            <Spin />
+          ) : (
+            <>
+              {films.map((film) => (
+                <Card key={film.id} film={film} />
+              ))}
+              <Pagination
+                defaultCurrent={1}
+                current={currentPage}
+                total={totalResults}
+                pageSize={20}
+                onChange={this.handlePageChange}
+              />
+            </>
+          )}
         </div>
       </div>
     );

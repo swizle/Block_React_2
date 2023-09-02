@@ -1,17 +1,24 @@
 import React from 'react';
-import { Input, Space } from 'antd';
+import { Input } from 'antd';
+import PropTypes from 'prop-types';
 
 const { Search } = Input;
-const onSearch = (value) => console.log(value);
 
-function Search2() {
+function Search2({ onSearchFilm, onChangeText }) {
   return (
-    <Space direction="vertical">
+    <div>
       <Search
-        placeholder="input search text"
-        onSearch={onSearch}
+        placeholder="input search text..."
+        onSearch={(value) => onSearchFilm(value)}
+        onChange={(value) => onChangeText(value)}
       />
-    </Space>
+    </div>
   );
 }
+
+Search2.propTypes = {
+  onSearchFilm: PropTypes.func.isRequired,
+  onChangeText: PropTypes.func.isRequired,
+};
+
 export default Search2;
