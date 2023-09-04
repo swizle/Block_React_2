@@ -36,7 +36,7 @@ function Card({ film, guestRate, genres }) {
 
   return (
     <div className="card">
-      <Image className="img" src={`https://image.tmdb.org/t/p/original${poster_path || '/wwemzKWzjKYJFfCeiB57q3r4Bcm.png'}`} alt="Doesn't have a poster(" />
+      <Image className="img" src={`https://image.tmdb.org/t/p/original${poster_path || '/uc4RAVW1T3T29h6OQdr7zu4Blui.jpg'}`} alt="Doesn't have a poster(" />
       <div className="container">
         <div className="title-container">
           <h2 className="title">{title}</h2>
