@@ -36,19 +36,21 @@ function Card({ film, guestRate, genres }) {
 
   return (
     <div className="card">
-      <Image className="img" src={`https://image.tmdb.org/t/p/original${poster_path}`} alt="Doesn't have a poster(" />
+      <Image className="img" src={`https://image.tmdb.org/t/p/original${poster_path || '/wwemzKWzjKYJFfCeiB57q3r4Bcm.png'}`} alt="Doesn't have a poster(" />
       <div className="container">
-        <div className="rating-circle" style={{ backgroundColor: getCircleColor() }}>
-          {vote_average}
+        <div className="title-container">
+          <h2 className="title">{title}</h2>
+          <div className="rating-circle" style={{ 'border-color': getCircleColor() }}>
+            {vote_average.toFixed(1)}
+          </div>
         </div>
-        <h2 className="title">{title}</h2>
         <p className="releaseDate">{format(new Date(release_date), 'MMMM d, yyyy')}</p>
         {genre_ids.map((genre_id) => (
           <Tag className="tag" key={genre_id}>
             {getGenreName(genre_id)}
           </Tag>
         ))}
-        <p className="description">{overview}</p>
+        <p className="description">{overview.substring(0, 200) || 'This movie doent have a description.'}</p>
         <Rate className="rate" count={10} onChange={(value) => guestRate(value, id)} />
       </div>
     </div>

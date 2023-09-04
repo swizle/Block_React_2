@@ -137,15 +137,20 @@ export default class MovieList extends Component {
     try {
       const response = await fetch(apiUrl, options);
       const data = await response.json();
+      const filmsData = data.results.slice(0, 100);
+      let filmsTotal = data.total_results;
 
-      if (data.total_results === 0) {
+      if (filmsTotal === 0) {
         alert('К сожалению, фильмов с таким названием нет!');
+      }
+      if (filmsTotal >= 100) {
+        filmsTotal = 100;
       }
 
       this.setState({
-        films: data.results,
+        films: filmsData,
         loading: false,
-        totalResults: data.total_results,
+        totalResults: filmsTotal,
       });
     } catch (error) {
       alert(error);
@@ -217,16 +222,17 @@ export default class MovieList extends Component {
               {films.map((film) => (
                 <Card key={film.id} film={film} guestRate={this.guestRate} genres={genres} />
               ))}
-              <Pagination
-                defaultCurrent={1}
-                current={currentPage}
-                total={totalResults}
-                pageSize={20}
-                onChange={this.handlePageChange}
-              />
             </>
           )}
         </div>
+        <Pagination
+          defaultCurrent={1}
+          current={currentPage}
+          total={totalResults}
+          pageSize={20}
+          showSizeChanger={false}
+          onChange={this.handlePageChange}
+        />
       </div>
     );
   }

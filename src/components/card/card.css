@@ -17,6 +17,22 @@
   padding: 10px;
 }
 
+.title-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.rating-circle {
+  min-width: 30px;
+  min-height: 30px;
+  align-self: center;
+  text-align: center;
+  line-height: 30px;
+  font-size: 12px;
+  border: 2px solid;
+  border-radius: 50%;
+}
+
 .releaseDate {
   font-size: 12px;
   color: #827E7E;
