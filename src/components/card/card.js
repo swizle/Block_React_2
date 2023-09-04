@@ -40,11 +40,11 @@ function Card({ film, guestRate, genres }) {
       <div className="container">
         <div className="title-container">
           <h2 className="title">{title}</h2>
-          <div className="rating-circle" style={{ 'border-color': getCircleColor() }}>
+          <div className="rating-circle" style={{ borderColor: getCircleColor() }}>
             {vote_average.toFixed(1)}
           </div>
         </div>
-        <p className="releaseDate">{format(new Date(release_date), 'MMMM d, yyyy')}</p>
+        <p className="releaseDate">{format(new Date(release_date || '01'), 'MMMM d, yyyy')}</p>
         {genre_ids.map((genre_id) => (
           <Tag className="tag" key={genre_id}>
             {getGenreName(genre_id)}
