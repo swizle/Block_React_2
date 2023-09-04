@@ -51,6 +51,27 @@ export default class MovieList extends Component {
     }
   };
 
+  // eslint-disable-next-line react/sort-comp, class-methods-use-this
+  fetchMethod = async (url) => {
+    const authKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Yzk0YjQyMDYxOWY3YmY1Yzg5ZmJlNDQ5ZjIzMzVmNSIsInN1YiI6IjY0ZWYyMDVhM2E5OTM3MDExY2JkMTEyMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.bx5BgGPER_m3UPUPnQ4s4JMiXv5ejsTGJj46OfdKL7w';
+    const options = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        Authorization: `Bearer ${authKey}`,
+      },
+    };
+
+    try {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      alert(error);
+      return null;
+    }
+  };
+
   guestRate = async (value, filmId) => {
     const { guestId } = this.state;
     const authKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Yzk0YjQyMDYxOWY3YmY1Yzg5ZmJlNDQ5ZjIzMzVmNSIsInN1YiI6IjY0ZWYyMDVhM2E5OTM3MDExY2JkMTEyMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.bx5BgGPER_m3UPUPnQ4s4JMiXv5ejsTGJj46OfdKL7w';
@@ -76,73 +97,33 @@ export default class MovieList extends Component {
   };
 
   fetchGuest = async () => {
-    const authKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Yzk0YjQyMDYxOWY3YmY1Yzg5ZmJlNDQ5ZjIzMzVmNSIsInN1YiI6IjY0ZWYyMDVhM2E5OTM3MDExY2JkMTEyMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.bx5BgGPER_m3UPUPnQ4s4JMiXv5ejsTGJj46OfdKL7w';
-    const authUrl = 'https://api.themoviedb.org/3/authentication/guest_session/new';
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${authKey}`,
-      },
-    };
+    const data = await this.fetchMethod('https://api.themoviedb.org/3/authentication/guest_session/new');
 
-    try {
-      const response = await fetch(authUrl, options);
-      const data = await response.json();
-
-      this.setState({
-        guestId: data.guest_session_id,
-      });
-      console.log(data.guest_session_id, this.state.guestId);
-    } catch (error) {
-      alert(error);
-    }
+    this.setState({
+      guestId: data.guest_session_id,
+    });
   };
 
   fetchGenres = async () => {
-    const authKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Yzk0YjQyMDYxOWY3YmY1Yzg5ZmJlNDQ5ZjIzMzVmNSIsInN1YiI6IjY0ZWYyMDVhM2E5OTM3MDExY2JkMTEyMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.bx5BgGPER_m3UPUPnQ4s4JMiXv5ejsTGJj46OfdKL7w';
-    const authUrl = 'https://api.themoviedb.org/3/genre/movie/list?language=en';
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${authKey}`,
-      },
-    };
+    const data = await this.fetchMethod('https://api.themoviedb.org/3/genre/movie/list?language=en');
 
-    try {
-      const response = await fetch(authUrl, options);
-      const data = await response.json();
-
-      this.setState({
-        genres: data.genres,
-      });
-    } catch (error) {
-      alert(error);
-    }
+    this.setState({
+      genres: data.genres,
+    });
   };
 
   fetchMovies = async () => {
     const { queryText, currentPage } = this.state;
-    const apiKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Yzk0YjQyMDYxOWY3YmY1Yzg5ZmJlNDQ5ZjIzMzVmNSIsInN1YiI6IjY0ZWYyMDVhM2E5OTM3MDExY2JkMTEyMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.bx5BgGPER_m3UPUPnQ4s4JMiXv5ejsTGJj46OfdKL7w';
-    const apiUrl = `https://api.themoviedb.org/3/search/movie?query=${queryText}&include_adult=false&language=en-US&page=${currentPage}`;
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-    };
+    const data = await this.fetchMethod(`https://api.themoviedb.org/3/search/movie?query=${queryText}&include_adult=false&language=en-US&page=${currentPage}`);
 
     try {
-      const response = await fetch(apiUrl, options);
-      const data = await response.json();
       const filmsData = data.results.slice(0, 100);
       let filmsTotal = data.total_results;
 
       if (filmsTotal === 0) {
         alert('К сожалению, фильмов с таким названием нет!');
       }
+
       if (filmsTotal >= 100) {
         filmsTotal = 100;
       }
@@ -160,20 +141,9 @@ export default class MovieList extends Component {
 
   fetchRating = async () => {
     const { guestId } = this.state;
-    const authKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Yzk0YjQyMDYxOWY3YmY1Yzg5ZmJlNDQ5ZjIzMzVmNSIsInN1YiI6IjY0ZWYyMDVhM2E5OTM3MDExY2JkMTEyMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.bx5BgGPER_m3UPUPnQ4s4JMiXv5ejsTGJj46OfdKL7w';
-    const authUrl = `https://api.themoviedb.org/3/guest_session/${guestId}/rated/movies?language=en-US&page=1&sort_by=created_at.asc`;
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${authKey}`,
-      },
-    };
+    const data = await this.fetchMethod(`https://api.themoviedb.org/3/guest_session/${guestId}/rated/movies?language=en-US&page=1&sort_by=created_at.asc`);
 
     try {
-      const response = await fetch(authUrl, options);
-      const data = await response.json();
-
       if (data.total_results === 0) {
         alert('К сожалению, вы еще не оценивали фильмы!');
       }
