@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import React, { Component } from 'react';
 import { Tabs, Spin, Pagination } from 'antd';
 import { debounce } from 'lodash';
@@ -9,12 +10,19 @@ import './app.css';
 
 export default class MovieList extends Component {
   state = {
+    genres: [],
     films: [],
     loading: true,
     queryText: '',
     currentPage: 1,
     totalResults: 0,
+    guestId: '',
   };
+
+  componentDidMount() {
+    this.fetchGuest();
+    this.fetchGenres();
+  }
 
   handleSearchFilm = (text) => {
     if (text.trim() === '') {
@@ -37,9 +45,86 @@ export default class MovieList extends Component {
     });
   };
 
-  async fetchMovies() {
+  handleTabChange = (activeKey) => {
+    if (activeKey === '2') {
+      this.fetchRating();
+    }
+  };
+
+  guestRate = async (value, filmId) => {
+    const { guestId } = this.state;
+    const authKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Yzk0YjQyMDYxOWY3YmY1Yzg5ZmJlNDQ5ZjIzMzVmNSIsInN1YiI6IjY0ZWYyMDVhM2E5OTM3MDExY2JkMTEyMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.bx5BgGPER_m3UPUPnQ4s4JMiXv5ejsTGJj46OfdKL7w';
+    const authUrl = `https://api.themoviedb.org/3/movie/${filmId}/rating?guest_session_id=${guestId}`;
+    const options = {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json;charset=utf-8',
+        Authorization: `Bearer ${authKey}`,
+      },
+      body: `{"value":${value}}`,
+    };
+
+    try {
+      const response = await fetch(authUrl, options);
+      const data = await response.json();
+
+      console.log(data);
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  fetchGuest = async () => {
+    const authKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Yzk0YjQyMDYxOWY3YmY1Yzg5ZmJlNDQ5ZjIzMzVmNSIsInN1YiI6IjY0ZWYyMDVhM2E5OTM3MDExY2JkMTEyMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.bx5BgGPER_m3UPUPnQ4s4JMiXv5ejsTGJj46OfdKL7w';
+    const authUrl = 'https://api.themoviedb.org/3/authentication/guest_session/new';
+    const options = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        Authorization: `Bearer ${authKey}`,
+      },
+    };
+
+    try {
+      const response = await fetch(authUrl, options);
+      const data = await response.json();
+
+      this.setState({
+        guestId: data.guest_session_id,
+      });
+      console.log(data.guest_session_id, this.state.guestId);
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  fetchGenres = async () => {
+    const authKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Yzk0YjQyMDYxOWY3YmY1Yzg5ZmJlNDQ5ZjIzMzVmNSIsInN1YiI6IjY0ZWYyMDVhM2E5OTM3MDExY2JkMTEyMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.bx5BgGPER_m3UPUPnQ4s4JMiXv5ejsTGJj46OfdKL7w';
+    const authUrl = 'https://api.themoviedb.org/3/genre/movie/list?language=en';
+    const options = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        Authorization: `Bearer ${authKey}`,
+      },
+    };
+
+    try {
+      const response = await fetch(authUrl, options);
+      const data = await response.json();
+
+      this.setState({
+        genres: data.genres,
+      });
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  fetchMovies = async () => {
     const { queryText, currentPage } = this.state;
-    const apiKey = '9c94b420619f7bf5c89fbe449f2335f5';
+    const apiKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Yzk0YjQyMDYxOWY3YmY1Yzg5ZmJlNDQ5ZjIzMzVmNSIsInN1YiI6IjY0ZWYyMDVhM2E5OTM3MDExY2JkMTEyMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.bx5BgGPER_m3UPUPnQ4s4JMiXv5ejsTGJj46OfdKL7w';
     const apiUrl = `https://api.themoviedb.org/3/search/movie?query=${queryText}&include_adult=false&language=en-US&page=${currentPage}`;
     const options = {
       method: 'GET',
@@ -66,11 +151,42 @@ export default class MovieList extends Component {
       alert(error);
       this.setState({ loading: false });
     }
-  }
+  };
+
+  fetchRating = async () => {
+    const { guestId } = this.state;
+    const authKey = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5Yzk0YjQyMDYxOWY3YmY1Yzg5ZmJlNDQ5ZjIzMzVmNSIsInN1YiI6IjY0ZWYyMDVhM2E5OTM3MDExY2JkMTEyMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.bx5BgGPER_m3UPUPnQ4s4JMiXv5ejsTGJj46OfdKL7w';
+    const authUrl = `https://api.themoviedb.org/3/guest_session/${guestId}/rated/movies?language=en-US&page=1&sort_by=created_at.asc`;
+    const options = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        Authorization: `Bearer ${authKey}`,
+      },
+    };
+
+    try {
+      const response = await fetch(authUrl, options);
+      const data = await response.json();
+
+      if (data.total_results === 0) {
+        alert('К сожалению, вы еще не оценивали фильмы!');
+      }
+
+      this.setState({
+        films: data.results,
+        loading: false,
+        totalResults: data.total_results,
+      });
+    } catch (error) {
+      alert(error);
+      this.setState({ loading: false });
+    }
+  };
 
   render() {
     const {
-      films, loading, currentPage, totalResults,
+      films, loading, currentPage, totalResults, genres,
     } = this.state;
 
     const tabs = [
@@ -91,7 +207,7 @@ export default class MovieList extends Component {
 
     return (
       <div className="movie-container">
-        <Tabs defaultActiveKey="1" centered items={tabs} />
+        <Tabs defaultActiveKey="1" centered items={tabs} onChange={this.handleTabChange} />
 
         <div className="movie-list">
           {loading ? (
@@ -99,7 +215,7 @@ export default class MovieList extends Component {
           ) : (
             <>
               {films.map((film) => (
-                <Card key={film.id} film={film} />
+                <Card key={film.id} film={film} guestRate={this.guestRate} genres={genres} />
               ))}
               <Pagination
                 defaultCurrent={1}
