@@ -16,6 +16,7 @@ function Card({ film, guestRate, genres }) {
     vote_average,
     id,
     genre_ids,
+    rating,
   } = film;
 
   const getCircleColor = () => {
@@ -51,7 +52,7 @@ function Card({ film, guestRate, genres }) {
           </Tag>
         ))}
         <p className="description">{overview.substring(0, 200) || 'This movie doent have a description.'}</p>
-        <Rate className="rate" count={10} onChange={(value) => guestRate(value, id)} />
+        <Rate className="rate" count={10} onChange={(value) => guestRate(value, id)} defaultValue={rating || 0} />
       </div>
     </div>
   );
@@ -66,6 +67,7 @@ Card.propTypes = {
     vote_average: PropTypes.number,
     id: PropTypes.number,
     genre_ids: PropTypes.any,
+    rating: PropTypes.number,
   }).isRequired,
   guestRate: PropTypes.func.isRequired,
   genres: PropTypes.any.isRequired,
