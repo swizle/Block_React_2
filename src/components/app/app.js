@@ -22,6 +22,7 @@ export default class MovieList extends Component {
   componentDidMount() {
     this.fetchGuest();
     this.fetchGenres();
+    this.handleSearchFilm('Return');
   }
 
   handleSearchFilm = (text) => {
@@ -211,17 +212,18 @@ export default class MovieList extends Component {
               {films.map((film) => (
                 <Card key={film.id} film={film} guestRate={this.guestRate} genres={genres} />
               ))}
+              <Pagination
+                defaultCurrent={1}
+                current={currentPage}
+                total={totalResults}
+                pageSize={20}
+                showSizeChanger={false}
+                onChange={this.handlePageChange}
+              />
             </>
           )}
         </div>
-        <Pagination
-          defaultCurrent={1}
-          current={currentPage}
-          total={totalResults}
-          pageSize={20}
-          showSizeChanger={false}
-          onChange={this.handlePageChange}
-        />
+
       </div>
     );
   }
