@@ -12,7 +12,7 @@ export default class MovieList extends Component {
   state = {
     genres: [],
     films: [],
-    loading: true,
+    loading: false,
     queryText: '',
     currentPage: 1,
     totalResults: 0,
@@ -22,7 +22,7 @@ export default class MovieList extends Component {
   componentDidMount() {
     this.fetchGuest();
     this.fetchGenres();
-    this.handleSearchFilm('Return');
+    this.handleSearchFilm('Clown');
   }
 
   handleSearchFilm = (text) => {
@@ -204,25 +204,27 @@ export default class MovieList extends Component {
       <div className="movie-container">
         <Tabs defaultActiveKey="1" centered items={tabs} onChange={this.handleTabChange} destroyInactiveTabPane={false} />
 
-        <div className="movie-list">
-          {loading ? (
+        {loading ? (
+          <div className="movie-list">
             <Spin />
-          ) : (
-            <>
+          </div>
+        ) : (
+          <>
+            <div className="movie-list">
               {films.map((film) => (
                 <Card key={film.id} film={film} guestRate={this.guestRate} genres={genres} />
               ))}
-              <Pagination
-                defaultCurrent={1}
-                current={currentPage}
-                total={totalResults}
-                pageSize={20}
-                showSizeChanger={false}
-                onChange={this.handlePageChange}
-              />
-            </>
-          )}
-        </div>
+            </div>
+            <Pagination
+              defaultCurrent={1}
+              current={currentPage}
+              total={totalResults}
+              pageSize={20}
+              showSizeChanger={false}
+              onChange={this.handlePageChange}
+            />
+          </>
+        )}
 
       </div>
     );
